@@ -1,23 +1,41 @@
+#include <iostream>
+#include <stdlib.h>
+#include <fstream>
 #include "scrambleheader.h"
 
+using std::string;
+using std::endl;
+using std::cout;
+using std::cin;
+using std::ifstream;
+using std::ofstream;
+
+//#define TEST_READ_FILE
+#ifdef TEST_READ_FILE
+void test_read_file(std::string word_file_path, string* words, int size);
+#endif
+
 //long file paths again, ugh.
-const string INPUT_PATH = "C:\\Users\\Samantha\\Documents\\Schoolwork\\Spring2016\\C++\\word_scramble_2\\words.txt";
-const string OUTPUT_PATH = "C:\\Users\\Samantha\\Documents\\Schoolwork\\Spring2016\\C++\\word_scramble_2\\"
-                              "scrambled_words.txt";
+const string INPUT_PATH = "words.txt";
+const string OUTPUT_PATH = "scrambled_words.txt";
 int main() {
+  #ifdef TEST_READ_FILE
+  std::string *test = new std::string[6];
+  test_read_file("words_fixture.txt", test, 6);
+  #endif
   // get number of words in file
   int size = word_count(INPUT_PATH);
 
   // create empty array of size equal to count
-  string original[size];
+  std::string *original = new std::string[size];
 
   // populate array by passing it into the read file function
-  read_file(original, size);
+  read_file(INPUT_PATH, original, size);
 
   // create empty array for scrambled words parallel to original
   // when scrambling, do not write over original array for comparisons
   // later on.
-  string scrambled[size];
+  std::string *scrambled = new std::string[size];
 
   // for each word in original array, scramble and store in new array
   for (int index = 0; index < size; index++) {
@@ -120,16 +138,28 @@ string scramble(string word){
 }
 
 // read unscrambled words from file
-void read_file(string* words, int size){
+void read_file(std::string word_file_path, string* words, int size){
   // open file and store each word in array
   // (Mental Note: do NOT use getline because it will read till line break)
-  ifstream file(INPUT_PATH);
+  ifstream file(word_file_path);
   int index = 0;
   for(int index = 0; index < size; index++) {
     file >> words[index];
   }
   file.close();
 }
+
+#ifdef TEST_READ_FILE
+void test_read_file(std::string word_file_path, string* words, int size){
+  read_file(word_file_path, words, size);
+  if(words->size() == 6){
+    std::cout<< "read file test passed for size" << std::endl;
+  }
+  if(words[0] == "binary"){
+    std::cout<< "read file test passed for read order" << std::endl;
+  }
+}
+#endif
 
 // write scrambled words to file for viewing
 void write_file(string* scrambled, int size) {
